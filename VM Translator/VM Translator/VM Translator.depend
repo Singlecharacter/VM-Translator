@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1397783148 source:c:\users\conor\desktop\vm translator\vm translator\main.cpp
+	"Translator.h"
+	<iostream>
+	<vector>
+	<string>
+
+1397785929 c:\users\conor\desktop\vm translator\vm translator\translator.h
+	<fstream>
+	<string>
+	<cstring>
+
