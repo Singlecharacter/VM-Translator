@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <iostream>
 
 class Translator
 {
@@ -21,12 +22,18 @@ public:
     void translateAnd();
     void translateOr();
     void translateNot();
-    void translatePop(std::string);
-    void translatePush(std::string);
+    bool translatePop(std::string, std::string);
+    bool translatePush(std::string, std::string);
+
+    void endProgram();
+
+    void printError(int);
 
 private:
 
     std::ofstream outFile;
+
+    int comparisonCounter;
 };
 
 #endif // TRANSLATOR_H
