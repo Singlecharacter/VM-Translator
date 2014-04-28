@@ -94,13 +94,13 @@ void Translator::translateEq()
     outFile << "(TRUE" << comparisonCounter << ")" << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=1" << std::endl;
+    outFile << "M=-1" << std::endl;
     outFile << "@END" << comparisonCounter << std::endl;
     outFile << "0;JMP" << std::endl;
     outFile << "(FALSE" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=-1" << std::endl;
+    outFile << "M=0" << std::endl;
     outFile << "(END" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "M=M+1" << std::endl;
@@ -130,13 +130,13 @@ void Translator::translateGt()
     outFile << "(TRUE" << comparisonCounter << ")" << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=1" << std::endl;
+    outFile << "M=-1" << std::endl;
     outFile << "@END" << comparisonCounter << std::endl;
     outFile << "0;JMP" << std::endl;
     outFile << "(FALSE" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=-1" << std::endl;
+    outFile << "M=0" << std::endl;
     outFile << "(END" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "M=M+1" << std::endl;
@@ -166,13 +166,13 @@ void Translator::translateLt()
     outFile << "(TRUE" << comparisonCounter << ")" << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=1" << std::endl;
+    outFile << "M=-1" << std::endl;
     outFile << "@END" << comparisonCounter << std::endl;
     outFile << "0;JMP" << std::endl;
     outFile << "(FALSE" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "A=M" << std::endl;
-    outFile << "M=-1" << std::endl;
+    outFile << "M=0" << std::endl;
     outFile << "(END" << comparisonCounter << ")"  << std::endl;
     outFile << "@SP" << std::endl;
     outFile << "M=M+1" << std::endl;
@@ -240,15 +240,43 @@ void Translator::translateNot()
 
 bool Translator::translatePop(std::string memSegment, std::string offset)
 {
-    if(memSegment == "local" || memSegment == "static" || memSegment == "this" || memSegment == "argument" || memSegment == "that")
+    if(memSegment == "local" || memSegment == "this" || memSegment == "argument" || memSegment == "that" || memSegment == "static")
     {
+        if(memSegment == "local")
+        {
+            memSegment = "1";
+        }
+        else if(memSegment == "this")
+        {
+            memSegment = "3";
+        }
+        else if(memSegment == "that")
+        {
+            memSegment = "4";
+        }
+        else if(memSegment == "argument")
+        {
+            memSegment = "2";
+        }
+
+        outFile << "@" + offset << std::endl;
+        outFile << "D=A" << std::endl;
+        if(memSegment != "static")
+        {
+            outFile << "A=M" << std::endl;
+        }
+        outFile << "A=A+D" << std::endl;
+        outFile << "D=A" << std::endl;
+        outFile << "@R13" << std::endl;
+        outFile << "M=D" << std::endl;
         outFile << "@SP" << std::endl;
         outFile << "M=M-1" << std::endl;
         outFile << "A=M" << std::endl;
         outFile << "D=M" << std::endl;
-        outFile << "@" + memSegment << std::endl;
-        outFile << "A=A+" + offset << std::endl;
+        outFile << "@R13" << std::endl;
+        outFile << "A=M" << std::endl;
         outFile << "M=D" << std::endl;
+
     }
     else
     {
@@ -260,8 +288,34 @@ bool Translator::translatePush(std::string memSegment, std::string offset)
 {
     if(memSegment == "local" || memSegment == "static" || memSegment == "this" || memSegment == "argument" || memSegment == "that")
     {
+        if(memSegment == "local")
+        {
+            memSegment = "1";
+        }
+        else if(memSegment == "static")
+        {
+            memSegment = "16";
+        }
+        else if(memSegment == "this")
+        {
+            memSegment = "3";
+        }
+        else if(memSegment == "that")
+        {
+            memSegment = "4";
+        }
+        else if(memSegment == "argument")
+        {
+            memSegment = "2";
+        }
+
+        outFile << "@R13" << std::endl;
+        outFile << "M=D" << std::endl;
+        outFile << "@" + offset << std::endl;
+        outFile << "D=A";
         outFile << "@" + memSegment << std::endl;
-        outFile << "A=A+" + offset << std::endl;
+        outFile << "A=A+D" << std::endl;
+
         outFile << "D=M" << std::endl;
         outFile << "@SP" << std::endl;
         outFile << "A=M" << std::endl;
