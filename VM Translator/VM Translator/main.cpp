@@ -3,8 +3,6 @@
 #include <vector>
 #include <string>
 
-int strToInt(std::string);
-
 void stripWhiteSpace(std::string&);
 
 int main()
@@ -54,16 +52,16 @@ int main()
 
     inFile.close();
 
-    std::string command, memSegment, offset;
-    bool gotCommand, gotSegment;
+    std::string command, arg1, arg2;
+    bool gotCommand, gotArg1;
 
     for(int i = 0;i<lines.size();i++)
     {
         command = "";
-        memSegment = "";
-        offset = "";
+        arg1 = "";
+        arg2 = "";
         gotCommand = false;
-        gotSegment = false;
+        gotArg1 = false;
 
         currentLine = lines.at(i);
 
@@ -102,14 +100,14 @@ int main()
         {
             if(currentLine[j] == ' ')
             {
-                if(!gotSegment)
+                if(!gotArg1)
                 {
-                    gotSegment = true;
-                    memSegment = currentLine.substr(0,j);
+                    gotArg1 = true;
+                    arg1 = currentLine.substr(0,j);
                     currentLine.erase(0,j);
                 }
             }
-            else if(gotSegment)
+            else if(gotArg1)
             {
                 break;
             }
@@ -117,17 +115,23 @@ int main()
 
         stripWhiteSpace(currentLine);
 
-        if(!gotSegment && (command == "push" || command == "pop"))
+        if(!gotArg1 && (command == "push" || command == "pop" || command == "label" || command == "goto" || command == "if-goto"))
         {
             translator.printError(i+1);
         }
 
-        offset = currentLine;
+        arg2 = currentLine;
 
-        if(offset == "" && (command != "push" || command != "pop"))
+        if(arg2 == "" && (command == "push" || command == "pop"))
         {
             translator.printError(i+1);
         }
+
+        /*std::cout << "COMMAND: " << command << std::endl;
+        std::cout << "ARG 1: " << arg1 << std::endl;
+        std::cout << "ARG 2: " << arg2 << std::endl;
+        std::cin.sync();
+        std::cin.get();*/
 
         if(command == "add")
         {
@@ -167,11 +171,35 @@ int main()
         }
         else if(command == "push")
         {
-            translator.translatePush(memSegment,offset);
+            translator.translatePush(arg1,arg2);
         }
         else if(command == "pop")
         {
-            translator.translatePop(memSegment,offset);
+            translator.translatePop(arg1,arg2);
+        }
+        else if(command == "label")
+        {
+            translator.translateLabel(arg2);
+        }
+        else if(command == "goto")
+        {
+            translator.translateGoto(arg2);
+        }
+        else if(command == "if-goto")
+        {
+            translator.translateIfGoto(arg2);
+        }
+        else if(command == "function")
+        {
+            translator.addFunction(arg1,arg2);
+        }
+        else if(command == "call")
+        {
+            translator.translateCall(arg1,arg2);
+        }
+        else if(command == "return")
+        {
+            translator.translateReturn();
         }
         else if(command[0] != '/' && command.length() > 1)
         {
@@ -181,23 +209,12 @@ int main()
 
     translator.endProgram();
 
-    std::cin.sync();
-    std::cin.get();
+    translator.translateFunctions();
+
+    //std::cin.sync();
+    //std::cin.get();
 
     return 0;
-}
-
-int strToInt(std::string str)
-{
-    int digit, num = 0;
-    for(int i = 0;i<str.length();i++)
-    {
-        digit = str[i] - 48;
-        num = num * 10;
-        num += digit;
-    }
-
-    return num;
 }
 
 void stripWhiteSpace(std::string& str)

@@ -2,13 +2,13 @@
 
 using std::endl;
 
-Translator::Translator(std::string fname) : comparisonCounter(0)
+Translator::Translator(std::string fname) : comparisonCounter(0), returnCounter(0)
 {
-    char *outName = new char[fname.length() + 5];
+    mainName = new char[fname.length() + 5];
 
-    strcpy(outName,(fname+".asm").c_str());
+    strcpy(mainName,(fname+".asm").c_str());
 
-    outFile.open(outName);
+    outFile.open(mainName);
 }
 
 Translator::~Translator()
@@ -372,6 +372,239 @@ bool Translator::translatePush(std::string memSegment, std::string offset)
     else
     {
         return false;
+    }
+}
+
+void Translator::translateLabel(std::string label)
+{
+    outFile << "(" << label << ")" << endl;
+}
+
+void Translator::translateGoto(std::string label)
+{
+    outFile << "//goto " << label << endl;
+
+    outFile << "@" << label << endl;
+    outFile << "0;JMP" << endl;
+}
+
+void Translator::translateIfGoto(std::string label)
+{
+    outFile << "//if-goto " << label << endl;
+
+    outFile << "@SP" << endl;
+    outFile << "M=M-1" << endl;
+    outFile << "A=M" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@" << label << endl;
+    outFile << "D;JNE" << endl;
+}
+
+void Translator::addFunction(std::string name,std::string args)
+{
+    outFile.close();
+    outFile.open("functions.temp",std::ofstream::app);
+
+    outFile << "(" << name << ")" << endl;
+    for(int i = 0;i < strToInt(args); i++)
+    {
+        translatePush("constant","0");
+    }
+}
+
+void Translator::translateCall(std::string name, std::string args)
+{
+    //push return address
+    outFile << "@RET" << returnCounter << endl;;
+    outFile << "D=A" << endl;
+    outFile << "@SP" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=M+1" << endl;
+
+    //push LCL
+    outFile << "@LCL" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@SP" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=M+1" << endl;
+
+    //push ARG
+    outFile << "@ARG" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@SP" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=M+1" << endl;
+
+    //push THIS
+    outFile << "@THIS" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@SP" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=M+1" << endl;
+
+    //push THAT
+    outFile << "@THAT" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@SP" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=M+1" << endl;
+
+    //ARG = SP-args-5
+    outFile << "@" << args << endl;
+    outFile << "D=A" << endl;
+    outFile << "@5" << endl;
+    outFile << "D=D+A" << endl;
+    outFile << "@SP" << endl;
+    outFile << "D=M-D" << endl;
+    outFile << "@ARG" << endl;
+    outFile << "M=D" << endl;
+
+    //LCL = SP
+    outFile << "@SP" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@LCL" << endl;
+    outFile << "M=D" << endl;
+
+    translateGoto(name);
+
+    outFile << "(RET" << returnCounter << ")" << endl;
+
+    returnCounter++;
+}
+
+void Translator::translateReturn()
+{
+    //FRAME = LCL
+    outFile << "@LCL" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@R13" << endl;
+    outFile << "M=D" << endl;
+
+    //RET = *(FRAME-5)
+    outFile << "@5" << endl;
+    outFile << "D=A" << endl;
+    outFile << "@R13" << endl;
+    outFile << "A=M" << endl;
+    outFile << "A=A-D" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@R14" << endl;
+    outFile << "M=D" << endl;
+
+    //*ARG = pop()
+    outFile << "@SP" << endl;
+    outFile << "M=M-1" << endl;
+    outFile << "A=M" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@ARG" << endl;
+    outFile << "A=M" << endl;
+    outFile << "M=D" << endl;
+
+
+    //SP = ARG + 1
+    outFile << "@ARG" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@SP" << endl;
+    outFile << "M=D" << endl;
+    outFile << "M=M+1" << endl;
+
+    //THAT = *(FRAME-1)
+    outFile << "@1" << endl;
+    outFile << "D=A" << endl;
+    outFile << "@R13" << endl;
+    outFile << "A=M" << endl;
+    outFile << "A=A-D" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@THAT" << endl;
+    outFile << "M=D" << endl;
+
+    //THIS = *(FRAME-2)
+    outFile << "@2" << endl;
+    outFile << "D=A" << endl;
+    outFile << "@R13" << endl;
+    outFile << "A=M" << endl;
+    outFile << "A=A-D" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@THIS" << endl;
+    outFile << "M=D" << endl;
+
+    //ARG = *(FRAME-3)
+    outFile << "@3" << endl;
+    outFile << "D=A" << endl;
+    outFile << "@R13" << endl;
+    outFile << "A=M" << endl;
+    outFile << "A=A-D" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@ARG" << endl;
+    outFile << "M=D" << endl;
+
+    //LCL = *(FRAME-4)
+    outFile << "@4" << endl;
+    outFile << "D=A" << endl;
+    outFile << "@R13" << endl;
+    outFile << "A=M" << endl;
+    outFile << "A=A-D" << endl;
+    outFile << "D=M" << endl;
+    outFile << "@LCL" << endl;
+    outFile << "M=D" << endl;
+
+    //goto RET
+    outFile << "@R14" << endl;
+    outFile << "D=M" << endl;
+    outFile << "A=D" << endl;
+    outFile << "0;JMP" << endl;
+
+    outFile.close();
+    outFile.open(mainName,std::ofstream::app);
+}
+
+void Translator::translateFunctions()
+{
+    std::vector<std::string> functions;
+
+    char inChar;
+
+    std::string temp = "";
+
+    inFile.open("functions.temp");
+
+    inChar = inFile.get();
+
+    while(inFile.good())
+    {
+        while(inChar != '\n')
+        {
+            temp += inChar;
+            inChar = inFile.get();
+        }
+
+        functions.push_back(temp);
+        temp = "";
+    }
+
+    inFile.close();
+
+    if(!outFile.is_open())
+    {
+        outFile.open(mainName,std::ofstream::app);
+    }
+
+    outFile << endl;
+    outFile << "//FUNCTIONS" << endl;
+    outFile << endl;
+
+    for(int i = 0; i < functions.size(); i++)
+    {
+        outFile << functions.at(i) << endl;
     }
 }
 

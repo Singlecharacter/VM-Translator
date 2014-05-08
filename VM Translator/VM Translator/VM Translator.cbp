@@ -34,6 +34,8 @@
 		<Unit filename="Translator.cpp" />
 		<Unit filename="Translator.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="strToInt.cpp" />
+		<Unit filename="strToInt.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

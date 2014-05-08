@@ -10,18 +10,26 @@
 	<string>
 	<cstring>
 
-1399520647 source:c:\users\conor\documents\github\vm-translator\vm translator\vm translator\main.cpp
+1399530323 source:c:\users\conor\documents\github\vm-translator\vm translator\vm translator\main.cpp
 	"Translator.h"
 	<iostream>
 	<vector>
 	<string>
 
-1397841094 c:\users\conor\documents\github\vm-translator\vm translator\vm translator\translator.h
+1399532082 c:\users\conor\documents\github\vm-translator\vm translator\vm translator\translator.h
 	<fstream>
 	<string>
 	<cstring>
 	<iostream>
+	<vector>
+	"strToInt.h"
 
-1399522615 source:c:\users\conor\documents\github\vm-translator\vm translator\vm translator\translator.cpp
+1399530247 source:c:\users\conor\documents\github\vm-translator\vm translator\vm translator\translator.cpp
 	"Translator.h"
+
+1399530452 c:\users\conor\documents\github\vm-translator\vm translator\vm translator\strtoint.h
+	<string>
+
+1399530437 source:c:\users\conor\documents\github\vm-translator\vm translator\vm translator\strtoint.cpp
+	"strToInt.h"
 

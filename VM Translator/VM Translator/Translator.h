@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 #include <iostream>
+#include <vector>
+#include "strToInt.h"
 
 class Translator
 {
@@ -24,6 +26,13 @@ public:
     void translateNot();
     bool translatePop(std::string, std::string);
     bool translatePush(std::string, std::string);
+    void translateLabel(std::string);
+    void translateGoto(std::string);
+    void translateIfGoto(std::string);
+    void translateCall(std::string,std::string);
+    void translateReturn();
+    void addFunction(std::string,std::string);
+    void translateFunctions();
 
     void endProgram();
 
@@ -33,7 +42,12 @@ private:
 
     std::ofstream outFile;
 
-    int comparisonCounter;
+    std::ifstream inFile;
+
+    char *mainName;
+
+    int comparisonCounter, returnCounter;
+
 };
 
 #endif // TRANSLATOR_H
