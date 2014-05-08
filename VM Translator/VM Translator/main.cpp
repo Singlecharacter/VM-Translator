@@ -129,13 +129,6 @@ int main()
             translator.printError(i+1);
         }
 
-        /*std::cout << command << "." << std::endl;
-        std::cout << memSegment << "." << std::endl;
-        std::cout << offset << "." << std::endl;
-        std::cin.sync();
-        std::cin.get();*/
-
-
         if(command == "add")
         {
             translator.translateAdd();
@@ -180,7 +173,7 @@ int main()
         {
             translator.translatePop(memSegment,offset);
         }
-        else if(command[0] != '/' && command.length() > 0)
+        else if(command[0] != '/' && command.length() > 1)
         {
             translator.printError(i+1);
         }
