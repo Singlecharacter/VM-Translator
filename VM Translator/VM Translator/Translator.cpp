@@ -8,6 +8,9 @@ Translator::Translator(std::string fname) : comparisonCounter(0), returnCounter(
 
     strcpy(mainName,(fname+".asm").c_str());
 
+    outFile.open("functions.temp");
+    outFile.close();
+
     outFile.open(mainName);
 }
 
@@ -577,18 +580,32 @@ void Translator::translateFunctions()
 
     inFile.open("functions.temp");
 
-    inChar = inFile.get();
-
     while(inFile.good())
     {
+        inChar = inFile.get();
         while(inChar != '\n')
         {
+            if(!inFile.good())
+            {
+                break;
+            }
             temp += inChar;
             inChar = inFile.get();
         }
 
+        if(!inFile.good())
+        {
+            break;
+        }
         functions.push_back(temp);
         temp = "";
+    }
+
+    std::cout << "Ok." << std::endl;
+
+    for(int i = 0;i<functions.size();i++)
+    {
+        std::cout << functions.at(i) << std::endl;
     }
 
     inFile.close();
